@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="/static/lib/markdown/lib/markdown.js"></script>
+        <style>
+            #preview{
+                position:absolute;
+                left:0;
+                top:0;
+                right:0;
+                bottom:0;
+                overflow:auto;
+                /*background-color: rgb(21, 59, 90);*/
+                /*color: #f1f1f1;*/
+                background-color: rgb(224, 224, 224);
+                color: rgb(0, 0, 0);
+                -webkit-font-smoothing: antialiased;
+                padding: 20px;
+                font-family: Arial;
+                font-size: 14px;
+            }
+            #preview>*:first-child {
+                margin-top: 0 !important;
+            }
+            
+            code {
+                background-color: rgb(240, 240, 240);
+                border: 1px solid rgb(199, 198, 198);
+                font-size: 13px;
+                line-height: 19px;
+                overflow: auto;
+                padding: 6px 10px;
+                border-radius: 3px;
+                display: inline-block;
+            }
+            
+            p, li {
+                line-height: 1.4em;
+            }
+            
+            a {
+                color: rgb(39, 102, 165);
+                text-decoration: none;
+            }
+            a:hover{
+                text-decoration: underline;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="preview" > 
+        
+        </div>
+        <script>
+            var preview = document.getElementById("preview");
+            
+            window.addEventListener("message", function(e){
+                // if (e.origin !== "http://example.org:8080")
+                //     return;
+                
+                if (e.data.type == "document")
+                    preview.innerHTML = markdown.toHTML(e.data.content);
+            }, false);
+            window.parent.postMessage({message: "stream.document"}, location.origin);
+        </script>
+    </body>
+</html>
