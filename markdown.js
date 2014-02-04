@@ -62,6 +62,12 @@ define(function(require, exports, module) {
             var tab     = doc.tab;
             var editor  = e.editor;
             
+            if (session.iframe) {
+                session.editor = editor;
+                editor.container.appendChild(session.iframe);
+                return;
+            }
+            
             var iframe = document.createElement("iframe");
             
             // iframe.setAttribute("nwfaketop", true);
@@ -132,6 +138,11 @@ define(function(require, exports, module) {
             // Set iframe
             session.iframe = iframe;
             
+            session.destroy = function(){
+                delete session.editor;
+                delete session.iframe;
+            }
+            
             // Load the markup renderer
             getPreviewUrl(function(url){ iframe.src = url; });
             
@@ -142,10 +153,8 @@ define(function(require, exports, module) {
             var doc     = e.doc;
             var session = doc.getSession();
             var iframe  = session.iframe;
-            iframe.parentNode.removeChild(iframe);
             
-            if (session.onchange)
-                session.pdoc.undoManager.off("change", session.onchange);
+            iframe.parentNode.removeChild(iframe);
             
             doc.tab.className.remove("loading");
         });
