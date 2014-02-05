@@ -27,6 +27,7 @@ define(function(require, exports, module) {
         });
         var emit = plugin.getEmitter();
         
+        var counter = 0;
         var HTMLURL, previewOrigin;
         
         /***** Methods *****/
@@ -88,6 +89,9 @@ define(function(require, exports, module) {
                 if (c9.hosted && event.origin !== previewOrigin)
                     return;
                 
+                if (e.data.id != session.id)
+                    return;
+                
                 if (e.data.message == "exec") {
                     commands.exec(e.data.command);
                 }
@@ -137,6 +141,7 @@ define(function(require, exports, module) {
             
             // Set iframe
             session.iframe = iframe;
+            session.id     = "markdown" + counter++;
             
             session.destroy = function(){
                 delete session.editor;
@@ -144,7 +149,9 @@ define(function(require, exports, module) {
             }
             
             // Load the markup renderer
-            getPreviewUrl(function(url){ iframe.src = url; });
+            getPreviewUrl(function(url){ 
+                iframe.src = url + "&id=" + session.id; 
+            });
             
             session.editor = editor;
             editor.container.appendChild(session.iframe);

@@ -25,6 +25,10 @@
             }
             
             code {
+                font-size: 13px;
+            }
+            
+            pre code {
                 background-color: rgb(240, 240, 240);
                 border: 1px solid rgb(199, 198, 198);
                 font-size: 13px;
@@ -54,9 +58,11 @@
         </div>
         <script>
             (function(){
-                /*global markdown*/
+                /*global marked*/
                 var preview = document.getElementById("preview");
-                var host = location.href.match(/host=(.*)/)[1];
+                var host = location.href.match(/host=(.*?)(\&|$)/)[1];
+                var id = location.href.match(/id=(.*)/)[1];
+                // var converter = new Markdown.Converter();
                 
                 var ckb;
                 function setKeys(list){
@@ -99,7 +105,7 @@
                         return;
                     
                     if (e.data.type == "document")
-                        preview.innerHTML = markdown.toHTML(e.data.content);
+                        preview.innerHTML = marked(e.data.content);
                     else if (e.data.type == "keys")
                         setKeys(e.data.keys);
                 }, false);
@@ -109,6 +115,7 @@
                 });
                 
                 function send(message){
+                    message.id = id;
                     window.parent.postMessage(message, 
                         host == "local" ? "*" : host);
                 }
