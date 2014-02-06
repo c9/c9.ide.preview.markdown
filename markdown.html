@@ -62,6 +62,7 @@
                 var preview = document.getElementById("preview");
                 var host = location.href.match(/host=(.*?)(\&|$)/)[1];
                 var id = location.href.match(/id=(.*)/)[1];
+                var parent = window.opener || window.parent;
                 // var converter = new Markdown.Converter();
                 
                 var ckb;
@@ -116,7 +117,7 @@
                 
                 function send(message){
                     message.id = id;
-                    window.parent.postMessage(message, 
+                    parent.postMessage(message, 
                         host == "local" ? "*" : host);
                 }
                 

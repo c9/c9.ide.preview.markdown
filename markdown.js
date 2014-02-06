@@ -204,6 +204,10 @@ define(function(require, exports, module) {
             tab.className.add("loading");
             iframe.src = iframe.src;
         });
+        plugin.on("popout", function(){
+            var src = plugin.activeSession.iframe.src;
+            window.open(src);
+        });
         plugin.on("enable", function(){
             
         });
