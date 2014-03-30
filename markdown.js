@@ -77,7 +77,7 @@ define(function(require, exports, module) {
             
             var iframe = document.createElement("iframe");
             
-            // iframe.setAttribute("nwfaketop", true);
+            iframe.setAttribute("nwfaketop", true);
             iframe.setAttribute("nwdisable", true);
 
             iframe.style.width    = "100%";
@@ -85,12 +85,16 @@ define(function(require, exports, module) {
             iframe.style.border   = 0;
             iframe.style.backgroundColor = "rgba(255, 255, 255, 0.88)";
             
-            // @todo to do this correctly stack needs to allow switching previewer
-            // if (options.local) {
-            //     iframe.addEventListener("load", function(){
-            //         plugin.activeSession.add(iframe.contentWindow.location.href);
-            //     });
-            // }
+            if (options.local) {
+                iframe.addEventListener("load", function(){
+                    // @todo to do this correctly stack needs to allow switching previewer
+                    // plugin.activeSession.add(iframe.contentWindow.location.href);
+                    
+                    iframe.contentWindow.opener = window;
+                    if (iframe.contentWindow.start)
+                        iframe.contentWindow.start(window);
+                });
+            }
             
             var onMessage = function(e) {
                 if (c9.hosted && event.origin !== previewOrigin)

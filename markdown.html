@@ -121,7 +121,13 @@
                         host == "local" ? "*" : host);
                 }
                 
-                send({ message: "stream.document" });
+                window.start = function(win){
+                    parent = win;
+                    send({ message: "stream.document" });
+                }
+                
+                if (parent != window)
+                    start();
             })();
         </script>
     </body>
