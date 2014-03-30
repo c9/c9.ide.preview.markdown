@@ -52,6 +52,12 @@ define(function(require, exports, module) {
             fn(HTMLURL);
         }
         
+        // function cleanIframeSrc(src){
+        //     return src
+        //         .replace(/\?host=.*?(?:\&|$)/, "")
+        //         .replace(/[\?\&]$/, "");
+        // }
+        
         /***** Lifecycle *****/
         
         plugin.on("load", function(){
@@ -79,11 +85,12 @@ define(function(require, exports, module) {
             iframe.style.border   = 0;
             iframe.style.backgroundColor = "rgba(255, 255, 255, 0.88)";
             
-            if (options.local) {
-                iframe.onload = function(){
-                    plugin.activeSession.add(iframe.contentWindow.location.href);
-                }
-            }
+            // @todo to do this correctly stack needs to allow switching previewer
+            // if (options.local) {
+            //     iframe.addEventListener("load", function(){
+            //         plugin.activeSession.add(iframe.contentWindow.location.href);
+            //     });
+            // }
             
             var onMessage = function(e) {
                 if (c9.hosted && event.origin !== previewOrigin)
