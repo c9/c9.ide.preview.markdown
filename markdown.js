@@ -22,7 +22,7 @@ define(function(require, exports, module) {
             caption  : "Markdown",
             index    : 200,
             selector : function(path){
-                return path.match(/(?:\.md|\.markdown)$/i);
+                return path && path.match(/(?:\.md|\.markdown)$/i);
             }
         });
         var emit = plugin.getEmitter();
