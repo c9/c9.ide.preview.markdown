@@ -122,11 +122,11 @@
                 }
                 
                 window.start = function(win){
-                    parent = win;
+                    parent = win || window.parent;
                     send({ message: "stream.document" });
                 }
                 
-                if (parent != window)
+                if (window.parent != window)
                     start();
             })();
         </script>
