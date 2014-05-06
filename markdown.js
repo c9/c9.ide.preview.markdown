@@ -8,20 +8,20 @@ define(function(require, exports, module) {
     // @todo possible improvements: http://benweet.github.io/stackedit/#
 
     function main(options, imports, register) {
-        var Previewer  = imports.Previewer;
-        var c9         = imports.c9;
-        var fs         = imports.fs;
-        var commands   = imports.commands;
+        var Previewer = imports.Previewer;
+        var c9 = imports.c9;
+        var fs = imports.fs;
+        var commands = imports.commands;
         var tabManager = imports.tabManager;
-        var showError  = imports["dialog.error"].show;
-        var dirname    = require("path").dirname;
+        var showError = imports["dialog.error"].show;
+        var dirname = require("path").dirname;
         
         /***** Initialization *****/
         
         var plugin = new Previewer("Ajax.org", main.consumes, {
-            caption  : "Markdown",
-            index    : 200,
-            selector : function(path){
+            caption: "Markdown",
+            index: 200,
+            selector: function(path) {
                 return path && path.match(/(?:\.md|\.markdown)$/i);
             }
         });
@@ -32,7 +32,7 @@ define(function(require, exports, module) {
         
         /***** Methods *****/
         
-        function getPreviewUrl(fn){
+        function getPreviewUrl(fn) {
             if (options.local && document.baseURI.substr(0, 5) == "file:")
                 return setTimeout(getPreviewUrl.bind(null, fn), 100);
             else if (HTMLURL)
@@ -52,7 +52,7 @@ define(function(require, exports, module) {
             fn(HTMLURL);
         }
         
-        // function cleanIframeSrc(src){
+        // function cleanIframeSrc(src) {
         //     return src
         //         .replace(/\?host=.*?(?:\&|$)/, "")
         //         .replace(/[\?\&]$/, "");
@@ -63,11 +63,11 @@ define(function(require, exports, module) {
         plugin.on("load", function(){
             
         });
-        plugin.on("documentLoad", function(e){
-            var doc     = e.doc;
+        plugin.on("documentLoad", function(e) {
+            var doc = e.doc;
             var session = doc.getSession();
-            var tab     = doc.tab;
-            var editor  = e.editor;
+            var tab = doc.tab;
+            var editor = e.editor;
             
             if (session.iframe) {
                 session.editor = editor;
@@ -80,9 +80,9 @@ define(function(require, exports, module) {
             iframe.setAttribute("nwfaketop", true);
             iframe.setAttribute("nwdisable", true);
 
-            iframe.style.width    = "100%";
-            iframe.style.height   = "100%";
-            iframe.style.border   = 0;
+            iframe.style.width = "100%";
+            iframe.style.height = "100%";
+            iframe.style.border = 0;
             iframe.style.backgroundColor = "rgba(255, 255, 255, 0.88)";
             
             if (options.local) {
@@ -116,8 +116,8 @@ define(function(require, exports, module) {
                         var doc = session.previewTab.document;
                         
                         session.source.postMessage({
-                            type    : "document",
-                            content : doc.value
+                            type: "document",
+                            content: doc.value
                         }, "*");
                         
                         if (!doc.hasValue())
@@ -126,20 +126,20 @@ define(function(require, exports, module) {
                             });
                     }
                     else {
-                        fs.readFile(session.path, function(err, data){
+                        fs.readFile(session.path, function(err, data) {
                             if (err)
                                 return showError(err.message);
                             
                             session.source.postMessage({
-                                type    : "document",
-                                content : data
+                                type: "document",
+                                content: data
                             }, "*");
                         });
                     }
                     
                     session.source.postMessage({
-                        type : "keys",
-                        keys : commands.getExceptionBindings()
+                        type: "keys",
+                        keys: commands.getExceptionBindings()
                     }, "*");
                     
                     tab.className.remove("loading");
@@ -152,7 +152,7 @@ define(function(require, exports, module) {
             
             // Set iframe
             session.iframe = iframe;
-            session.id     = "markdown" + counter++;
+            session.id = "markdown" + counter++;
             
             session.destroy = function(){
                 delete session.editor;
@@ -160,58 +160,58 @@ define(function(require, exports, module) {
             }
             
             // Load the markup renderer
-            getPreviewUrl(function(url){ 
+            getPreviewUrl(function(url) { 
                 iframe.src = url + "&id=" + session.id; 
             });
             
             session.editor = editor;
             editor.container.appendChild(session.iframe);
         });
-        plugin.on("documentUnload", function(e){
-            var doc     = e.doc;
+        plugin.on("documentUnload", function(e) {
+            var doc = e.doc;
             var session = doc.getSession();
-            var iframe  = session.iframe;
+            var iframe = session.iframe;
             
             iframe.parentNode.removeChild(iframe);
             
             doc.tab.className.remove("loading");
         });
-        plugin.on("documentActivate", function(e){
+        plugin.on("documentActivate", function(e) {
             var session = e.doc.getSession();
             
             session.iframe.style.display = "block";
             session.editor.setLocation(session.path);
             session.editor.setButtonStyle("Markdown", "page_white.png");
         });
-        plugin.on("documentDeactivate", function(e){
+        plugin.on("documentDeactivate", function(e) {
             var session = e.doc.getSession();
             session.iframe.style.display = "none";
         });
-        plugin.on("navigate", function(e){
-            var tab    = plugin.activeDocument.tab;
+        plugin.on("navigate", function(e) {
+            var tab = plugin.activeDocument.tab;
             var iframe = plugin.activeSession.iframe;
             var editor = plugin.activeSession.editor;
             
             tab.className.add("loading");
             
-            tab.title    = 
-            tab.tooltip  = "[M] " + e.url;
+            tab.title = 
+            tab.tooltip = "[M] " + e.url;
             editor.setLocation(e.url);
             
             iframe.src = iframe.src;
         });
-        plugin.on("update", function(e){
+        plugin.on("update", function(e) {
             var session = plugin.activeSession;
             if (!session.source) return; // Renderer is not loaded yet
     
             session.source.postMessage({
-                type    : "document",
-                content : e.previewDocument.value
+                type: "document",
+                content: e.previewDocument.value
             }, "*");
         });
         plugin.on("reload", function(){
             var iframe = plugin.activeSession.iframe;
-            var tab    = plugin.activeDocument.tab;
+            var tab = plugin.activeDocument.tab;
             tab.className.add("loading");
             iframe.src = iframe.src;
         });
