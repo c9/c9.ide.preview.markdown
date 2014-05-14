@@ -126,8 +126,8 @@
                     send({ message: "stream.document" });
                 }
                 
-                if (window.parent != window)
-                    start();
+                if (parent != window)
+                    window.start(parent);
             })();
         </script>
     </body>
