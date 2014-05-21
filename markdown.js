@@ -142,7 +142,7 @@ define(function(require, exports, module) {
                         keys: commands.getExceptionBindings()
                     }, "*");
                     
-                    tab.className.remove("loading");
+                    tab.classList.remove("loading");
                 }
             };
             window.addEventListener("message", onMessage, false);
@@ -174,7 +174,7 @@ define(function(require, exports, module) {
             
             iframe.parentNode.removeChild(iframe);
             
-            doc.tab.className.remove("loading");
+            doc.tab.classList.remove("loading");
         });
         plugin.on("documentActivate", function(e) {
             var session = e.doc.getSession();
@@ -192,7 +192,7 @@ define(function(require, exports, module) {
             var iframe = plugin.activeSession.iframe;
             var editor = plugin.activeSession.editor;
             
-            tab.className.add("loading");
+            tab.classList.add("loading");
             
             tab.title = 
             tab.tooltip = "[M] " + e.url;
@@ -212,7 +212,7 @@ define(function(require, exports, module) {
         plugin.on("reload", function(){
             var iframe = plugin.activeSession.iframe;
             var tab = plugin.activeDocument.tab;
-            tab.className.add("loading");
+            tab.classList.add("loading");
             iframe.src = iframe.src;
         });
         plugin.on("popout", function(){
