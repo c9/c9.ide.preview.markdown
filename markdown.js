@@ -146,6 +146,9 @@ define(function(require, exports, module) {
                 }
             };
             window.addEventListener("message", onMessage, false);
+            session.addOther(function(){
+                window.removeEventListener("message", onMessage, false);
+            });
             
             // Set iframe
             session.iframe = iframe;
@@ -154,8 +157,6 @@ define(function(require, exports, module) {
             session.destroy = function(){
                 delete session.editor;
                 delete session.iframe;
-                
-                window.removeEventListener("message", onMessage, false);
             }
             
             // Load the markup renderer
