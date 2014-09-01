@@ -97,7 +97,7 @@ define(function(require, exports, module) {
             }
             
             var onMessage = function(e) {
-                if (c9.hosted && event.origin !== previewOrigin)
+                if (c9.hosted && e.origin !== previewOrigin)
                     return;
                 
                 if (e.data.id != session.id)
