@@ -1,6 +1,7 @@
 define(function(require, exports, module) {
     main.consumes = [
-        "c9", "Previewer", "fs", "dialog.error", "commands", "tabManager"
+        "c9", "Previewer", "fs", "dialog.error", "commands", "tabManager", 
+        "layout", "settings"
     ];
     main.provides = ["preview.markdown"];
     return main;
@@ -12,6 +13,8 @@ define(function(require, exports, module) {
         var c9 = imports.c9;
         var fs = imports.fs;
         var commands = imports.commands;
+        var layout = imports.layout;
+        var settings = imports.settings;
         var tabManager = imports.tabManager;
         var showError = imports["dialog.error"].show;
         var dirname = require("path").dirname;
@@ -26,6 +29,14 @@ define(function(require, exports, module) {
             }
         });
         var emit = plugin.getEmitter();
+        
+        var BGCOLOR = { 
+            "flat-light": "rgb(250,250,250)", 
+            "light": "rgba(255, 255, 255, 0.88)", 
+            "light-gray": "rgba(255, 255, 255, 0.88)",
+            "dark": "rgba(255, 255, 255, 0.88)",
+            "dark-gray": "rgba(255, 255, 255, 0.88)" 
+        };
         
         var counter = 0;
         var HTMLURL, previewOrigin;
@@ -83,7 +94,12 @@ define(function(require, exports, module) {
             iframe.style.width = "100%";
             iframe.style.height = "100%";
             iframe.style.border = 0;
-            iframe.style.backgroundColor = "rgba(255, 255, 255, 0.88)";
+            
+            function setTheme(e) {
+                iframe.style.backgroundColor = BGCOLOR[e.theme];
+            }
+            layout.on("themeChange", setTheme, doc);
+            setTheme({ theme: settings.get("user/general/@skin") || "dark" });
             
             if (options.local) {
                 iframe.addEventListener("load", function(){
