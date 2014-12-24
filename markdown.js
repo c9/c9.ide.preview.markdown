@@ -99,7 +99,7 @@ define(function(require, exports, module) {
                 iframe.style.backgroundColor = BGCOLOR[e.theme];
             }
             layout.on("themeChange", setTheme, doc);
-            setTheme({ theme: settings.get("user/general/@skin") || "dark" });
+            setTheme({ theme: settings.get("user/general/@skin") });
             
             if (options.local) {
                 iframe.addEventListener("load", function(){
