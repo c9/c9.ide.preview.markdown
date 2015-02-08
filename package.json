@@ -9,14 +9,12 @@
         "url": "http://github.com/c9/c9.ide.preview.markdown.git"
     },
     "plugins": {
-        "plugin": {
-            "markdown": {}
-        }
+        "markdown": {}
     },
     "categories": [
         "core"
     ],
     "licenses": [
-        ""
+        "MIT"
     ]
 }
