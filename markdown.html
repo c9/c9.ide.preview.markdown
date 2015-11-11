@@ -19,12 +19,13 @@
                 
                 -webkit-font-smoothing: antialiased;
                 -moz-osx-font-smoothing: grayscale;
-                /*font-family: Arial;*/
-                /*font-size: 14px;*/
             }
-            /*#preview>*:first-child {*/
-            /*    margin-top: 0 !important;*/
-            /*}*/
+            #preview pre code div {
+                background: transparent !important;
+            }
+            #preview .ace_line {
+                white-space: nowrap;
+            }
         </style>
     </head>
     <body>
@@ -32,19 +33,14 @@
         
         </div>
         <script>
-            /* Highlighting:
-                - https://github.com/ajaxorg/ace/blob/master/lib/ace/ext/static_highlight.js#L72
-                - https://github.com/ajaxorg/ace/blob/master/demo/static-highlighter.html#L62-L78
-                - use post message
-                - create async by finding elements after the fact (hidden element with id)
-            */
-        
             (function(){
                 /*global Remarkable*/
                 var preview = document.getElementById("preview");
                 var host = location.href.match(/host=(.*?)(\&|$)/)[1];
                 var id = location.href.match(/id=(.*)/)[1];
                 var parent = window.opener || window.parent;
+                
+                var count = 0;
                 
                 var md = new Remarkable({
                     html:         true,        // Enable HTML tags in source
@@ -62,7 +58,17 @@
                     
                     // Highlighter function. Should return escaped HTML,
                     // or '' if the source string is not changed
-                    highlight: function (/*str, lang*/) { return ''; }
+                    highlight: function (str, lang) { 
+                        var id = count++;
+                        send({ 
+                            message: "highlight", 
+                            content: str, 
+                            lang: lang, 
+                            hid: id 
+                        });
+                        
+                        return '<span id="findme' + id + '"></span>' + str; 
+                    }
                 });
                 md.renderer.rules.paragraph_open = function (tokens, idx) {
                     var line;
@@ -155,7 +161,8 @@
             
                         a = nonEmptyList[pos];
                         b = nonEmptyList[pos + 1];
-                        _scrollMap[i] = Math.round((_scrollMap[b] * (i - a) + _scrollMap[a] * (b - i)) / (b - a));
+                        _scrollMap[i] = Math.round((_scrollMap[b] * (i - a) 
+                            + _scrollMap[a] * (b - i)) / (b - a));
                     }
                     
                     _scrollMap[0] = 0;
@@ -215,7 +222,7 @@
                     }
                 });
                 
-                var scrollMap, lastValue;
+                var scrollMap, lastValue, highlightStyle;
                 window.addEventListener("message", function(e){
                     if (host != "local" && e.origin !== host)
                         return;
@@ -234,6 +241,15 @@
                         var posTo = scrollMap[e.data.lineNumber];
                         
                         scrollTo(posTo);
+                    }
+                    else if (e.data.type == "highlight") {
+                        var el = document.getElementById("findme" + e.data.hid);
+                        if (!el) return;
+                        if (!highlightStyle) {
+                            highlightStyle = document.head.appendChild(document.createElement("style"));
+                            highlightStyle.innerText = e.data.css;
+                        }
+                        el.parentNode.innerHTML = e.data.html;
                     }
                 }, false);
                 

@@ -19,6 +19,9 @@ define(function(require, exports, module) {
         var showError = imports["dialog.error"].show;
         var dirname = require("path").dirname;
         
+        var highlighter = require("ace/ext/static_highlight");
+        var modelist = require("ace/ext/modelist");
+        
         /***** Initialization *****/
         
         var plugin = new Previewer("Ajax.org", main.consumes, {
@@ -124,6 +127,22 @@ define(function(require, exports, module) {
                 }
                 else if (e.data.message == "focus") {
                     tabManager.focusTab(tab);
+                }
+                else if (e.data.message == "highlight") {
+                    var mode = (modelist.modeByName[e.data.lang] 
+                        || modelist.getModeForPath("file." + e.data.lang) 
+                        || 0).mode || "ace/mode/" + e.data.lang;
+                    var theme = settings.get("user/ace/@theme");
+                    var value = e.data.content.replace(/[\n\r]*$/, "");
+                    
+                    highlighter.render(value, mode, theme, 0, true, function (highlighted) {
+                        session.source.postMessage({
+                            type: "highlight",
+                            hid: e.data.hid,
+                            html: highlighted.html,
+                            css: highlighted.css
+                        }, "*");
+                    });
                 }
                 else if (e.data.message == "stream.document") {
                     session.source = e.source;
