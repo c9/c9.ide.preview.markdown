@@ -31,7 +31,7 @@ define(function(require, exports, module) {
         var emit = plugin.getEmitter();
         
         var BGCOLOR = { 
-            "flat-light": "rgb(250,250,250)", 
+            "flat-light": "rgb(255,255,255)", 
             "light": "rgba(255, 255, 255, 0.88)", 
             "light-gray": "rgba(255, 255, 255, 0.88)",
             "dark": "rgba(255, 255, 255, 0.88)",
@@ -172,7 +172,7 @@ define(function(require, exports, module) {
                 delete session.iframe;
                 
                 window.removeEventListener("message", onMessage, false);
-            }
+            };
             
             // Load the markup renderer
             getPreviewUrl(function(url) { 
@@ -206,6 +206,7 @@ define(function(require, exports, module) {
             var tab = plugin.activeDocument.tab;
             var iframe = plugin.activeSession.iframe;
             var editor = plugin.activeSession.editor;
+            var session = e.session;
             
             tab.classList.add("loading");
             
@@ -214,6 +215,25 @@ define(function(require, exports, module) {
             editor.setLocation(e.url);
             
             iframe.src = iframe.src;
+            
+            if (!session.scrollHook){
+                var aceSession = session.previewTab.document.getSession().session;
+                if (!aceSession) return;
+                    
+                aceSession.on("changeScrollTop", function(scrollTopPx){
+                    if (!session.source) return; // Renderer is not loaded yet
+    
+                    var visibleRow = aceSession.c9doc.editor.ace.renderer.getFirstFullyVisibleRow();
+                    setTimeout(function(){
+                        session.source.postMessage({
+                            type: "scroll",
+                            lineNumber: visibleRow
+                        }, "*");
+                    });
+                });
+                // TODO cleanup?
+                session.scrollHook = true;
+            }
         });
         plugin.on("update", function(e) {
             var session = plugin.activeSession;
@@ -221,7 +241,9 @@ define(function(require, exports, module) {
     
             session.source.postMessage({
                 type: "document",
-                content: e.previewDocument.value
+                content: e.previewDocument.value,
+                fontSize: settings.get("user/ace/fontSize"),
+                fontFamily: settings.get("user/ace/fontFamily")
             }, "*");
         });
         plugin.on("reload", function(){
