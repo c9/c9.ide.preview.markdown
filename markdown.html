@@ -262,7 +262,7 @@
                     else if (e.data.type == "scroll") {
                         if (!scrollMap)
                             scrollMap = buildScrollMap(lastValue);
-                        var line = Math.max(0, e.data.lineNumber - 1);
+                        var line = Math.max(0, e.data.lineNumber - 2);
                         var posTo = scrollMap[line];
                         
                         scrollTo(posTo);
