@@ -150,15 +150,12 @@ define(function(require, exports, module) {
                     if (session.previewTab) {
                         var doc = session.previewTab.document;
                         
-                        session.source.postMessage({
-                            type: "document",
-                            content: doc.value
-                        }, "*");
-                        
                         if (!doc.hasValue())
                             doc.once("setValue", function(){
                                 emit("update", { previewDocument: doc });
                             });
+                        else
+                            emit("update", { previewDocument: doc });
                     }
                     else {
                         fs.readFile(session.path, function(err, data) {
@@ -264,6 +261,11 @@ define(function(require, exports, module) {
                 fontSize: settings.get("user/ace/fontSize"),
                 fontFamily: settings.get("user/ace/fontFamily")
             }, "*");
+            
+            setTimeout(function(){
+                var doc = session.previewTab.document;
+                doc.getSession().session._emit("changeScrollTop");
+            }, 100);
         });
         plugin.on("reload", function(){
             var iframe = plugin.activeSession.iframe;

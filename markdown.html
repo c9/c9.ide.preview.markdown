@@ -92,6 +92,24 @@
                     return '<h' + tokens[idx].hLevel + '>';
                 };
                 
+                md.renderer.rules.list_item_open = function (tokens, idx) {
+                    var line;
+                    if (tokens[idx].lines) {
+                        line = tokens[idx].lines[0];
+                        return '<li class="line" data-line="' + line + '">';
+                    }
+                    return '<li>';
+                };
+                
+                md.renderer.rules.blockquote_open = function (tokens, idx) {
+                    var line;
+                    if (tokens[idx].lines) {
+                        line = tokens[idx].lines[0];
+                        return '<blockquote class="line" data-line="' + line + '">';
+                    }
+                    return '<blockquote>';
+                };
+                
                 // Build offsets for each line (lines can be wrapped)
                 // That's a bit dirty to process each line everytime, but ok for demo.
                 // Optimizations are required only for big texts.
@@ -202,7 +220,9 @@
                     var incr = dist / 10;
                     
                     timer = setInterval(function(){
-                        if (document.body.scrollTop + incr > posTo) {
+                        if (incr < 0
+                          ? document.body.scrollTop + incr < posTo
+                          : document.body.scrollTop + incr > posTo) {
                             document.body.scrollTop = posTo;
                             clearInterval(timer);
                         }
@@ -242,7 +262,8 @@
                     else if (e.data.type == "scroll") {
                         if (!scrollMap)
                             scrollMap = buildScrollMap(lastValue);
-                        var posTo = scrollMap[e.data.lineNumber];
+                        var line = Math.max(0, e.data.lineNumber - 1);
+                        var posTo = scrollMap[line];
                         
                         scrollTo(posTo);
                     }
