@@ -129,7 +129,7 @@ define(function(require, exports, module) {
                     tabManager.focusTab(tab);
                 }
                 else if (e.data.message == "highlight") {
-                    var mode = (modelist.modeByName[e.data.lang] 
+                    var mode = (modelist.modesByName[e.data.lang] 
                         || modelist.getModeForPath("file." + e.data.lang) 
                         || 0).mode || "ace/mode/" + e.data.lang;
                     var theme = settings.get("user/ace/@theme");
