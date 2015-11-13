@@ -19,9 +19,6 @@ define(function(require, exports, module) {
         var showError = imports["dialog.error"].show;
         var dirname = require("path").dirname;
         
-        var highlighter = require("ace/ext/static_highlight");
-        var modelist = require("ace/ext/modelist");
-        
         /***** Initialization *****/
         
         var plugin = new Previewer("Ajax.org", main.consumes, {
@@ -129,34 +126,21 @@ define(function(require, exports, module) {
                 else if (e.data.message == "focus") {
                     tabManager.focusTab(tab);
                 }
-                else if (e.data.message == "highlight") {
-                    var mode = (modelist.modesByName[e.data.lang] 
-                        || modelist.getModeForPath("file." + e.data.lang) 
-                        || 0).mode || "ace/mode/" + e.data.lang;
-                    var theme = settings.get("user/ace/@theme");
-                    var value = e.data.content.replace(/[\n\r]*$/, "");
-                    
-                    highlighter.render(value, mode, theme, 0, true, function (highlighted) {
-                        session.source.postMessage({
-                            type: "highlight",
-                            hid: e.data.hid,
-                            html: highlighted.html,
-                            css: highlighted.css
-                        }, "*");
-                    });
-                }
                 else if (e.data.message == "stream.document") {
                     session.source = e.source;
                     
                     if (session.previewTab) {
                         var doc = session.previewTab.document;
                         
+                        session.source.postMessage({
+                            type: "document",
+                            content: doc.value
+                        }, "*");
+                        
                         if (!doc.hasValue())
                             doc.once("setValue", function(){
                                 emit("update", { previewDocument: doc });
                             });
-                        else
-                            emit("update", { previewDocument: doc });
                     }
                     else {
                         fs.readFile(session.path, function(err, data) {
@@ -189,7 +173,7 @@ define(function(require, exports, module) {
                 delete session.iframe;
                 
                 window.removeEventListener("message", onMessage, false);
-            };
+            }
             
             // Load the markup renderer
             getPreviewUrl(function(url) { 
@@ -223,7 +207,6 @@ define(function(require, exports, module) {
             var tab = plugin.activeDocument.tab;
             var iframe = plugin.activeSession.iframe;
             var editor = plugin.activeSession.editor;
-            var session = e.session;
             
             tab.classList.add("loading");
             
@@ -232,25 +215,6 @@ define(function(require, exports, module) {
             editor.setLocation(e.url);
             
             iframe.src = iframe.src;
-            
-            if (!session.scrollHook){
-                var aceSession = session.previewTab.document.getSession().session;
-                if (!aceSession) return;
-                    
-                aceSession.on("changeScrollTop", function(scrollTopPx){
-                    if (!session.source) return; // Renderer is not loaded yet
-    
-                    var visibleRow = aceSession.c9doc.editor.ace.renderer.getFirstFullyVisibleRow();
-                    setTimeout(function(){
-                        session.source.postMessage({
-                            type: "scroll",
-                            lineNumber: visibleRow
-                        }, "*");
-                    });
-                });
-                // TODO cleanup?
-                session.scrollHook = true;
-            }
         });
         plugin.on("update", function(e) {
             var session = plugin.activeSession;
@@ -258,15 +222,8 @@ define(function(require, exports, module) {
     
             session.source.postMessage({
                 type: "document",
-                content: e.previewDocument.value,
-                fontSize: settings.get("user/ace/fontSize"),
-                fontFamily: settings.get("user/ace/fontFamily")
+                content: e.previewDocument.value
             }, "*");
-            
-            setTimeout(function(){
-                var doc = session.previewTab.document;
-                doc.getSession().session._emit("changeScrollTop");
-            }, 100);
         });
         plugin.on("reload", function(){
             var iframe = plugin.activeSession.iframe;
