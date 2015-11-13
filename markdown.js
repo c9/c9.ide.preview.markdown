@@ -67,6 +67,30 @@ define(function(require, exports, module) {
             fn(HTMLURL);
         }
         
+        function enableScroll(session){
+            if (!session.previewTab || !session.previewTab.loaded)
+                return;
+            if (session.scrollHook && session.scrollHook == session.previewTab)
+                return;
+               
+            var aceSession = session.previewTab.document.getSession().session;
+            if (!aceSession) return;
+                
+            aceSession.on("changeScrollTop", function(scrollTopPx){
+                if (!session.source) return; // Renderer is not loaded yet
+
+                var visibleRow = aceSession.c9doc.editor.ace.renderer.getFirstFullyVisibleRow();
+                setTimeout(function(){
+                    session.source.postMessage({
+                        type: "scroll",
+                        lineNumber: visibleRow
+                    }, "*");
+                });
+            });
+            // TODO cleanup?
+            session.scrollHook = true;
+        }
+        
         // function cleanIframeSrc(src) {
         //     return src
         //         .replace(/\?host=.*?(?:\&|$)/, "")
@@ -233,24 +257,7 @@ define(function(require, exports, module) {
             
             iframe.src = iframe.src;
             
-            if (!session.scrollHook && session.previewTab){
-                var aceSession = session.previewTab.document.getSession().session;
-                if (!aceSession) return;
-                    
-                aceSession.on("changeScrollTop", function(scrollTopPx){
-                    if (!session.source) return; // Renderer is not loaded yet
-    
-                    var visibleRow = aceSession.c9doc.editor.ace.renderer.getFirstFullyVisibleRow();
-                    setTimeout(function(){
-                        session.source.postMessage({
-                            type: "scroll",
-                            lineNumber: visibleRow
-                        }, "*");
-                    });
-                });
-                // TODO cleanup?
-                session.scrollHook = true;
-            }
+           enableScroll(session);
         });
         plugin.on("update", function(e) {
             var session = plugin.activeSession;
@@ -263,8 +270,12 @@ define(function(require, exports, module) {
                 fontFamily: settings.get("user/ace/fontFamily")
             }, "*");
             
+           enableScroll(session);
+           
             setTimeout(function(){
-                if (!session.previewTab) return;
+                if (!session.previewTab || !session.previewTab.loaded) 
+                    return;
+                
                 var doc = session.previewTab.document;
                 doc.getSession().session._emit("changeScrollTop");
             }, 100);
