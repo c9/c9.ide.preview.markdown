@@ -76,7 +76,7 @@ define(function(require, exports, module) {
             var aceSession = session.previewTab.document.getSession().session;
             if (!aceSession) return;
                 
-            aceSession.on("changeScrollTop", function(scrollTopPx){
+            var listen = function(scrollTopPx){
                 if (!session.source) return; // Renderer is not loaded yet
 
                 var visibleRow = aceSession.c9doc.editor.ace.renderer.getFirstFullyVisibleRow();
@@ -86,9 +86,14 @@ define(function(require, exports, module) {
                         lineNumber: visibleRow
                     }, "*");
                 });
+            };
+            
+            aceSession.on("changeScrollTop", listen);
+            session.previewTab.on("unload", function(){
+                aceSession.removeListener("changeScrollTop", listen);
             });
-            // TODO cleanup?
-            session.scrollHook = true;
+            
+            session.scrollHook = session.previewTab;
         }
         
         // function cleanIframeSrc(src) {
