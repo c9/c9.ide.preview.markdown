@@ -233,7 +233,7 @@ define(function(require, exports, module) {
             
             iframe.src = iframe.src;
             
-            if (!session.scrollHook){
+            if (!session.scrollHook && session.previewTab){
                 var aceSession = session.previewTab.document.getSession().session;
                 if (!aceSession) return;
                     
@@ -264,6 +264,7 @@ define(function(require, exports, module) {
             }, "*");
             
             setTimeout(function(){
+                if (!session.previewTab) return;
                 var doc = session.previewTab.document;
                 doc.getSession().session._emit("changeScrollTop");
             }, 100);
