@@ -162,7 +162,7 @@ define(function(require, exports, module) {
                     var mode = (modelist.modesByName[e.data.lang] 
                         || modelist.getModeForPath("file." + e.data.lang) 
                         || 0).mode || "ace/mode/" + e.data.lang;
-                    var theme = settings.get("user/ace/@theme");
+                    var theme = "ace/theme/cloud9_day";
                     var value = e.data.content.replace(/[\n\r]*$/, "");
                     
                     highlighter.render(value, mode, theme, 0, true, function (highlighted) {
