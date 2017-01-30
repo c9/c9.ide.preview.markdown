@@ -255,9 +255,9 @@ define(function(require, exports, module) {
             var session = e.session;
             
             tab.classList.add("loading");
-            
-            tab.title = 
+
             tab.tooltip = "[M] " + e.url;
+            tab.title = session.doc.title || tab.tooltip;
             editor.setLocation(e.url);
             
             iframe.src = iframe.src;
