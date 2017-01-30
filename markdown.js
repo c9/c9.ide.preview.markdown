@@ -67,7 +67,7 @@ define(function(require, exports, module) {
             fn(HTMLURL);
         }
         
-        function enableScroll(session){
+        function enableScroll(session) {
             if (!session.previewTab || !session.previewTab.loaded)
                 return;
             if (session.scrollHook && session.scrollHook == session.previewTab)
@@ -76,11 +76,11 @@ define(function(require, exports, module) {
             var aceSession = session.previewTab.document.getSession().session;
             if (!aceSession) return;
                 
-            var listen = function(scrollTopPx){
+            var listen = function(scrollTopPx) {
                 if (!session.source) return; // Renderer is not loaded yet
 
                 var visibleRow = aceSession.c9doc.editor.ace.renderer.getFirstFullyVisibleRow();
-                setTimeout(function(){
+                setTimeout(function() {
                     session.source.postMessage({
                         type: "scroll",
                         lineNumber: visibleRow
@@ -89,7 +89,7 @@ define(function(require, exports, module) {
             };
             
             aceSession.on("changeScrollTop", listen);
-            session.previewTab.on("unload", function(){
+            session.previewTab.on("unload", function() {
                 aceSession.removeListener("changeScrollTop", listen);
             });
             
@@ -104,7 +104,7 @@ define(function(require, exports, module) {
         
         /***** Lifecycle *****/
         
-        plugin.on("load", function(){
+        plugin.on("load", function() {
             
         });
         plugin.on("sessionStart", function(e) {
@@ -135,7 +135,7 @@ define(function(require, exports, module) {
             setTheme({ theme: settings.get("user/general/@skin") });
             
             if (options.local) {
-                iframe.addEventListener("load", function(){
+                iframe.addEventListener("load", function() {
                     // @todo to do this correctly stack needs to allow switching previewer
                     // plugin.activeSession.add(iframe.contentWindow.location.href);
                     
@@ -181,7 +181,7 @@ define(function(require, exports, module) {
                         var doc = session.previewTab.document;
                         
                         if (!doc.hasValue())
-                            doc.once("setValue", function(){
+                            doc.once("setValue", function() {
                                 emit("update", { previewDocument: doc });
                             });
                         else
@@ -213,7 +213,7 @@ define(function(require, exports, module) {
             session.iframe = iframe;
             session.id = "markdown" + counter++;
             
-            session.destroy = function(){
+            session.destroy = function() {
                 delete session.editor;
                 delete session.iframe;
                 
@@ -277,7 +277,7 @@ define(function(require, exports, module) {
             
            enableScroll(session);
            
-            setTimeout(function(){
+            setTimeout(function() {
                 if (!session.previewTab || !session.previewTab.loaded) 
                     return;
                 
@@ -285,23 +285,23 @@ define(function(require, exports, module) {
                 doc.getSession().session._emit("changeScrollTop");
             }, 100);
         });
-        plugin.on("reload", function(){
+        plugin.on("reload", function() {
             var iframe = plugin.activeSession.iframe;
             var tab = plugin.activeDocument.tab;
             tab.classList.add("loading");
             iframe.src = iframe.src;
         });
-        plugin.on("popout", function(){
+        plugin.on("popout", function() {
             var src = plugin.activeSession.iframe.src;
             window.open(src);
         });
-        plugin.on("enable", function(){
+        plugin.on("enable", function() {
             
         });
-        plugin.on("disable", function(){
+        plugin.on("disable", function() {
             
         });
-        plugin.on("unload", function(){
+        plugin.on("unload", function() {
         });
         
         /***** Register and define API *****/
